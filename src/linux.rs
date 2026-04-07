@@ -1,5 +1,6 @@
 use std::fs::{self, File};
 use std::io::{BufRead, BufReader};
+use std::process::Command;
 
 fn get_os_info() -> Option<String> {
     let file = File::open("/etc/os-release").ok()?;
@@ -27,10 +28,7 @@ fn get_cpu_info() -> Option<String> {
         }
     }
 
-    Some(format!(
-        "{}",
-        model.unwrap_or("Unknown".into()),
-    ))
+    Some(format!("{}", model.unwrap_or("Unknown".into()),))
 }
 
 fn get_mem_info() -> Option<String> {
@@ -43,7 +41,7 @@ fn get_mem_info() -> Option<String> {
             mem = line.split(':').nth(1).map(|s| s.trim().to_string());
         }
     }
-    
+
     if let Some(mem_str) = mem {
         let kb_value = mem_str.split_whitespace().next()?.parse::<f64>().ok()?;
 
@@ -55,17 +53,41 @@ fn get_mem_info() -> Option<String> {
     Some("Memory: Unknown".into())
 }
 
+fn get_uptime_info() -> Option<String> {
+    let seconds = fs::read_to_string("/proc/uptime").ok()?
+        .split_whitespace()
+        .next()?
+        .parse::<f64>().ok()?;
+
+    let hours = seconds / 3600.0;
+    Some(format!("{:.2} hours", hours))
+}
+
+
+fn get_shell_info() -> Option<String> {
+    std::env::var("SHELL").ok()
+}
+
 pub fn show_info() {
     if let Ok(os) = fs::read_to_string("/etc/hostname") {
         println!("\x1b[34mHost:\x1b[0m {}", os.trim());
     }
+    if let Ok(kernel) = fs::read_to_string("/proc/sys/kernel/osrelease") {
+        println!("\x1b[34mKernel:\x1b[0m Linux {}", kernel.trim());
+    }
+    if let Some(up) = get_uptime_info() {
+        println!("\x1b[34mUptime:\x1b[0m {}", up);
+    }
+    if let Some(sh) = get_shell_info() {
+        println!("\x1b[34mShell:\x1b[0m {}", sh);
+    }
     if let Some(os) = get_os_info() {
         println!("\x1b[34mOS:\x1b[0m {}", os);
     }
-    if let Some(os) = get_cpu_info() {
-        println!("\x1b[34mCPU:\x1b[0m {}", os);
+    if let Some(cpu) = get_cpu_info() {
+        println!("\x1b[34mCPU:\x1b[0m {}", cpu);
     }
-    if let Some(os) = get_mem_info() {
-        println!("\x1b[34mMemory:\x1b[0m {}", os);
+    if let Some(mem) = get_mem_info() {
+        println!("\x1b[34mMemory:\x1b[0m {}", mem);
     }
 }
