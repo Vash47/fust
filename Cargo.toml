@@ -4,8 +4,8 @@ version = "0.1.0"
 edition = "2024"
 description = "A fast system info tool written in Rust"
 license = "MIT"
-repository = "https://github.com/temidaradev/frust"
-homepage = "https://github.com/temidaradev/frust"
+repository = "https://github.com/temidaradev/fust"
+homepage = "https://github.com/temidaradev/fust"
 
 [dependencies]
 libc = "0.2.185"
