@@ -1,4 +1,4 @@
-# frust
+# fust
 
 A minimal system fetch tool written in Rust. Shows your system info next to your distro's ascii art. That's it.
 
@@ -9,7 +9,7 @@ A minimal system fetch tool written in Rust. Shows your system info next to your
 - Hostname and kernel version
 - OS name, uptime, shell
 - CPU model
-- GPU(s) via `lspci`
+- GPU(s) via `pci-ids`
 - RAM usage and swap
 - Disk usage for `/`
 - How long it took to run and how much memory it used
@@ -23,21 +23,21 @@ Arch, Alpine, Asahi, CachyOS, EndeavourOS, Ubuntu, Debian, Fedora, NixOS — any
 You need Rust installed. Then:
 
 ```sh
-git clone https://github.com/temidaradev/frust
-cd frust
+git clone https://github.com/temidaradev/fust
+cd fust
 cargo build --release
 ```
 
-Binary ends up at `target/release/frust`. Move it wherever you want it.
+Binary ends up at `target/release/fust`. Move it wherever you want it.
 
 ```sh
-sudo cp target/release/frust /usr/local/bin/
+sudo cp target/release/fust /usr/local/bin/
 ```
 
 ## Running
 
 ```sh
-frust
+fust
 ```
 
 No flags, no config file. It reads everything straight from `/proc` and `/etc`.
@@ -45,5 +45,9 @@ No flags, no config file. It reads everything straight from `/proc` and `/etc`.
 ## Dependencies
 
 - `libc` — for the `statvfs` disk stat call
-- `lspci` — needs to be installed for GPU detection (part of `pciutils`)
+- `pci-ids` — bundled PCI ID database for GPU detection (no external tools needed)
+
+## How GPU detection works
+
+Reads `/sys/class/drm/*/device/uevent`, parses `PCI_ID=VENDOR:DEVICE`, looks up vendor and device name via the `pci-ids` crate. No `lspci` or `pciutils` required.
 
